@@ -14,14 +14,16 @@
   align-items: center;
 }
 
-.unique-salad_ingredients {
+.salad-ingrediends {
+  margin: 20px;
+  border-bottom: 1px solid rgba(0, 200, 250, 0.6);
 }
-.salad-ingredient {
-    border: 1px solid rgba(0, 200, 250, 0.6);
-    margin: 5px;
-    padding: 4px;
+.salad-ingredient_title {
+    margin: 20px;
+    padding: 10px;
     border-radius: 4px;
     cursor: pointer;
+    box-shadow: $navbar-btn;
 }
 .salad-ingredient:hover {
     background: rgba(0, 200, 250, 0.6);
@@ -40,6 +42,7 @@
   align-items: center;
   justify-content:space-around;
   width: 200px;
+  margin: 20px;
 }
 
 .unique-salad_btn {
@@ -48,6 +51,7 @@
   background: none;
   cursor: pointer;
   border-radius: 4px;
+  margin: 10px;
 }
 .unique-salad_btn:hover {
   background: rgba(0, 200, 250, 0.6);

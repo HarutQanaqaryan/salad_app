@@ -1,4 +1,4 @@
-import { fetchMoleculesType } from "../moleculesreducer";
+import { fetchMoleculesType } from "../moleculesReducer";
 
 export const fetchMolecules = () => {
   return async (dispatch) => {

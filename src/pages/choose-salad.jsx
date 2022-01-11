@@ -6,9 +6,10 @@ import { SaladCard } from "../components/salad-card";
 import { fetchSalads } from "../store/action-creators/fetch-salads";
 import { ADDED_SALAD_STORAGE, addSaladType } from "../store/addSaladReducer";
 import { DATA_SALAD_STORAGE, fetchSaladsType } from "../store/saladReducer";
+import { Loading } from "../components/loading";
+import { Error } from "../components/error";
 import "../assets/styles/choose-salad.scss";
-import loadingIcon from "../assets/loading-icon.svg";
-import errorIcon from "../assets/error-icon.svg";
+
 
 const ChooseSalad = () => {
   const { salads, loading, error } = useSelector((state) => state.salads);
@@ -89,18 +90,11 @@ const ChooseSalad = () => {
   return (
     <div className="choose-salad-block">
       <BackWelcomePage />
-      {loading && (
-        <div>
-          <img src={loadingIcon} alt="loading icon" />
-        </div>
-      )}
-      {error && (
-        <div>
-          <p>Упс! Что-то сломалось !</p>
-          <img src={errorIcon} alt="error-icon" />
-          <p>Попробуйте чуть позже :(</p>
-        </div>
-      )}
+
+      {loading && <Loading />}
+
+      {error && <Error />}
+
       {salads.map(({ dataSalad, isAdded }) => {
         return (
           <SaladCard
