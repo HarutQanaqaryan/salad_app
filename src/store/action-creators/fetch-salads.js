@@ -24,7 +24,6 @@ export const fetchSalads = () => {
       .catch((e) => {
         dispatch({
           type: fetchSaladsType.FETCH_SALADS_ERROR,
-          payload: "При загрузке произошла ошибка",
         });
       });
   };

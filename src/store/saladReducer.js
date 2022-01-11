@@ -9,17 +9,17 @@ export const fetchSaladsType = {
 const initialState = {
   salads: JSON.parse(localStorage.getItem(DATA_SALAD_STORAGE)) || [],
   loading: false,
-  error: null,
+  error: false,
 };
 
 export const saladsReducer = (state = initialState, action) => {
   switch (action.type) {
     case fetchSaladsType.FETCH_SALADS:
-      return { loading: true, error: null, salads: [] };
+      return { loading: true, error: false, salads: [] };
     case fetchSaladsType.FETCH_SALADS_SUCCES:
-      return { loading: false, error: null, salads: action.payload };
+      return { loading: false, error: false, salads: action.payload };
     case fetchSaladsType.FETCH_SALADS_ERROR:
-      return { loading: false, error: action.payload, salads: [] };
+      return { loading: false, error: true, salads: [] };
     case fetchSaladsType.ADDED_SALAD:
       return {
         ...state,
