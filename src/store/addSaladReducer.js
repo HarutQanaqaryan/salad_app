@@ -1,24 +1,21 @@
+export const ADDED_SALAD_STORAGE = "ADDED_SALAD_STORAGE";
+
 export const addSaladType = {
   ADD_SALAD: "ADD_SALAD",
   REMOVE_SALAD: "REMOVE_SALAD",
 };
 const initialState = {
-  addSalad: [],
-  addBtnLabel: "Добавить в мои салаты",
+  addedSalads: JSON.parse(localStorage.getItem(ADDED_SALAD_STORAGE)) || []
 };
 
 export const addSaladReducer = (state = initialState, action) => {
   switch (action.type) {
     case addSaladType.ADD_SALAD:
-      return state.addSalad.length === 0
-        ? { addSalad: [action.payload], addBtnLabel: "Удалить" }
-        : {
-            ...state,
-            addSalad: [...state.addSalad, action.payload],
-            addBtnLabel: "Удалить",
-          };
+      return {
+        addedSalads: [...state.addedSalads, action.payload],
+      };
     case addSaladType.REMOVE_SALAD:
-      return { addSalad: action.payload, addBtnLabel: "Добавить в мои салаты" };
+      return { addedSalads: action.payload};
     default:
       return state;
   }

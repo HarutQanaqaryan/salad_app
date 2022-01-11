@@ -4,43 +4,113 @@ import { useSelector } from "react-redux";
 import BackWelcomePage from "../components/back-to-welcome-page";
 import { SaladCard } from "../components/salad-card";
 import { fetchSalads } from "../store/action-creators/fetch-salads";
-import { addSaladType } from "../store/addSaladReducer";
+import { ADDED_SALAD_STORAGE, addSaladType } from "../store/addSaladReducer";
+import { DATA_SALAD_STORAGE, fetchSaladsType } from "../store/saladReducer";
 import "../assets/styles/choose-salad.scss";
+import loadingIcon from "../assets/loading-icon.svg";
+import errorIcon from "../assets/error-icon.svg";
 
 const ChooseSalad = () => {
   const { salads, loading, error } = useSelector((state) => state.salads);
-  const { addSalad, addBtnLabel } = useSelector((state) => state.mySalads);
+  const { addedSalads } = useSelector((state) => state.mySalads);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchSalads());
+    !localStorage.getItem(DATA_SALAD_STORAGE) && dispatch(fetchSalads());
   }, [dispatch]);
 
-  const addMySalads = (e) => {
-    dispatch({ type: addSaladType.ADD_SALAD, payload: e.target.parentElement });
-  };
+  const addMySalads = useCallback(
+    (e) => {
+      let parentElemId = e.target.parentElement.id;
+      let addedSaladsIds = addedSalads.map((item) => item.blockId);
 
-  if (loading) {
-    console.log("loading");
-  }
+      if (
+        addedSaladsIds.length === 0 ||
+        !addedSaladsIds.includes(parentElemId)
+      ) {
+        salads.forEach((item) => {
+          if (parentElemId === item.dataSalad._id) {
+            dispatch({
+              type: addSaladType.ADD_SALAD,
+              payload: {
+                title: item.dataSalad.title,
+                price: item.dataSalad.price,
+                discount_price: item.dataSalad.discount_price,
+                blockId: item.dataSalad._id,
+                added: true,
+              },
+            });
+            dispatch({
+              type: fetchSaladsType.ADDED_SALAD,
+              id: parentElemId,
+              added: true,
+            });
+          }
+        });
+      }
 
-  if (error) {
-    console.log(error);
-  }
+      if (addedSaladsIds.includes(parentElemId)) {
+        dispatch({
+          type: addSaladType.REMOVE_SALAD,
+          payload: addedSalads.filter((el) => el.blockId !== parentElemId),
+        });
+      }
+      if (
+        JSON.parse(
+          localStorage.getItem(ADDED_SALAD_STORAGE).includes(parentElemId)
+        )
+      ) {
+        return (
+          JSON.parse(localStorage.getItem(ADDED_SALAD_STORAGE)).filter(
+            (item) => item.blockId !== parentElemId
+          ),
+          dispatch({
+            type: fetchSaladsType.ADDED_SALAD,
+            id: parentElemId,
+            added: false,
+          })
+        );
+      }
+    },
+    [addedSalads, dispatch, salads]
+  );
+
+  useEffect(() => {
+    localStorage.setItem(
+      ADDED_SALAD_STORAGE,
+      JSON.stringify(addedSalads.map((item) => item))
+    );
+  }, [addedSalads]);
+
+  useEffect(() => {
+    localStorage.setItem(DATA_SALAD_STORAGE, JSON.stringify(salads));
+  }, [salads]);
 
   return (
     <div className="choose-salad-block">
       <BackWelcomePage />
-      {salads.map((salad) => {
+      {loading && (
+        <div>
+          <img src={loadingIcon} alt="loading icon" />
+        </div>
+      )}
+      {error && (
+        <div>
+          <p>Упс! Что-то сломалось !</p>
+          <img src={errorIcon} alt="error-icon" />
+          <p>Попробуйте чуть позже :(</p>
+        </div>
+      )}
+      {salads.map(({ dataSalad, isAdded }) => {
         return (
           <SaladCard
-            title={salad.title}
-            price={salad.price}
-            discount_price={salad.discount_price}
-            key={salad._id}
+            title={dataSalad.title}
+            price={dataSalad.price}
+            discount_price={dataSalad.discount_price}
+            key={dataSalad._id}
             onClick={addMySalads}
-            btn_label={addBtnLabel}
-            id={salad._id}
+            btn_label={isAdded ? "Добавлено" : "Добавить в мои салаты"}
+            blockId={dataSalad._id}
           />
         );
       })}
