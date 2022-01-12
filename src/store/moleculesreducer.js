@@ -1,4 +1,5 @@
-export const DATA_SALAD_STORAGE = "DATA_SALAD_STORAGE";
+export const INGREDIENTS_STORAGE = "INGREDIENTS_STORAGE";
+
 export const fetchMoleculesType = {
   FETCH_MOLECULES: "FETCH_MOLECULES",
   FETCH_MOLECULES_SUCCES: "FETCH_MOLECULES_SUCCES",
@@ -7,7 +8,7 @@ export const fetchMoleculesType = {
 };
 
 const initialState = {
-  molecules: [],
+  molecules: JSON.parse(localStorage.getItem(INGREDIENTS_STORAGE)) || [],
   loading: false,
   error: false,
 };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import BackWelcomePage from "../components/back-to-welcome-page";
 import { MoleculesCard } from "../components/molecules-card";
@@ -10,9 +10,13 @@ import "../assets/styles/unique-salad.scss";
 import { Loading } from "../components/loading";
 import { Error } from "../components/error";
 import removeMoleculeIcon from "../assets/remove.svg";
-import { fetchMoleculesType } from "../store/moleculesReducer";
+import {
+  fetchMoleculesType,
+  INGREDIENTS_STORAGE,
+} from "../store/moleculesReducer";
 import { removeSelectedMolecule } from "../helpers/removeSelectMolecule";
-import { addDecreaseQty } from "../helpers/addDecreaseQty";
+import { addDecreaseQty, updatePrice } from "../helpers/addDecreaseQty";
+import { sumPrices } from "../helpers/sumPrices";
 
 const CreateSalad = () => {
   const { molecules, loading, error } = useSelector((state) => state.molecules);
@@ -25,17 +29,24 @@ const CreateSalad = () => {
   const [parentElementId, setParentElementId] = useState();
 
   useEffect(() => {
-    dispatch(fetchMolecules());
+    !localStorage.getItem(INGREDIENTS_STORAGE) && dispatch(fetchMolecules());
   }, [dispatch]);
+
+  // useEffect(() => {
+  //   localStorage.setItem(INGREDIENTS_STORAGE, JSON.stringify(molecules));
+  // }, [molecules]);
 
   const addOrDecreaseQty = (e) => {
     const parentElemId = e.target.parentElement.id;
 
     setParentElementId(e.target.parentElement.id);
 
+    updatePrice(e, parentElemId, dispatch, ingredients, molecules);
+
     addDecreaseQty(e, parentElemId, dispatch, ingredients);
   };
 
+  console.log(ingredients.map((el) => el.discount_price).reduce((acc, el) => acc + el, 0))
   useEffect(() => {
     if (ingredients.some((el) => el.qty === 0)) {
       removeSelectedMolecule(parentElementId, dispatch, ingredients);
@@ -66,13 +77,6 @@ const CreateSalad = () => {
             id: parentElemId,
             added: true,
           });
-          dispatch({
-            type: addMoleculesType.ADD_PRICE,
-            price: {
-              price: item.dataMolecules.discount_price,
-              moleculeId: item.dataMolecules._id,
-            },
-          });
         }
       });
     }
@@ -89,6 +93,8 @@ const CreateSalad = () => {
     }
   };
 
+  console.log(ingredients);
+
   const checkOrderUniqueSalad = () => {
     ingredients.forEach(({ qty, blockId }) => {
       molecules.forEach(({ dataMolecules }) => {
@@ -100,12 +106,12 @@ const CreateSalad = () => {
       });
     });
   };
-console.log(moleculesPrice)
+
   return (
     <div className="molecules">
       <BackWelcomePage />
       <CreateUniqueSalad
-        price={` $`}
+        price={`${moleculesPrice} $`}
         btnLabel={saved ? "Добавлено" : "Сохранить"}
         clickSave={checkOrderUniqueSalad}
       >

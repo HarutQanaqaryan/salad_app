@@ -1,4 +1,4 @@
-import { fetchMoleculesType } from "../moleculesReducer";
+import { fetchMoleculesType, INGREDIENTS_STORAGE } from "../moleculesReducer";
 
 export const fetchMolecules = () => {
   return async (dispatch) => {
@@ -12,6 +12,14 @@ export const fetchMolecules = () => {
             return { dataMolecules, isAdded: false };
           })
         });
+        // localStorage.setItem(
+        //   INGREDIENTS_STORAGE,
+        //   JSON.stringify(
+        //     data.result.map((dataMolecules) => {
+        //       return { dataMolecules, isAdded: false };
+        //     })
+        //   )
+        // );
       })
       .catch((e) => {
         dispatch({

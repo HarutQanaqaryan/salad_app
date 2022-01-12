@@ -1,4 +1,5 @@
 export const DATA_SALAD_STORAGE = "DATA_SALAD_STORAGE";
+
 export const fetchSaladsType = {
   FETCH_SALADS: "FETCH_SALDS",
   FETCH_SALADS_SUCCES: "FETCH_SALADS_SUCCES",
