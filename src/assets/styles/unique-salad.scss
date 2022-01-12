@@ -2,16 +2,17 @@
 
 .unique-salad {
   width: 300px;
-  min-height: 200px;
+  min-height: 400px;
   margin: auto;
   margin-top: 50px;
   margin-bottom: 50px;
   border: $border;
   border-radius: 6px;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   flex-direction: column;
   align-items: center;
+  background-color: white;
 }
 
 .salad-ingrediends {
@@ -69,10 +70,22 @@
   justify-content:center;
   align-items: center;
   flex-direction: row;
+  padding: 5px;
 }
 .salad-qty_number {
-    font-size: 22px;
+    font-size: 18px;
 }
 .decrease-add-qty:hover {
   background: rgba(0, 200, 250, 0.6);
+}
+
+.remove-icon {
+  max-width: 20px;
+  max-height: 20px;
+  margin-left: 15px;
+  cursor: pointer;
+  padding: 3px;
+}
+.remove-icon:hover {
+  background: rgba(217, 250, 0, 0.6);
 }

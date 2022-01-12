@@ -10,7 +10,7 @@ export const fetchMolecules = () => {
           type: fetchMoleculesType.FETCH_MOLECULES_SUCCES,
           payload: data.result.map((dataMolecules) => {
             return { dataMolecules, isAdded: false };
-          }),
+          })
         });
       })
       .catch((e) => {

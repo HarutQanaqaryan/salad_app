@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import BackWelcomePage from "../components/back-to-welcome-page";
 import { MoleculesCard } from "../components/molecules-card";
@@ -9,90 +9,142 @@ import "../assets/styles/create-salad.scss";
 import "../assets/styles/unique-salad.scss";
 import { Loading } from "../components/loading";
 import { Error } from "../components/error";
+import removeMoleculeIcon from "../assets/remove.svg";
+import { fetchMoleculesType } from "../store/moleculesReducer";
+import { removeSelectedMolecule } from "../helpers/removeSelectMolecule";
+import { addDecreaseQty } from "../helpers/addDecreaseQty";
 
 const CreateSalad = () => {
   const { molecules, loading, error } = useSelector((state) => state.molecules);
   const {
     ingredients = [],
-    price = 0,
+    moleculesPrice,
     saved,
   } = useSelector((state) => state.createUniqueSalad);
   const dispatch = useDispatch();
+  const [parentElementId, setParentElementId] = useState();
 
   useEffect(() => {
     dispatch(fetchMolecules());
   }, [dispatch]);
 
-  const addDecreaseQty = (e) => {
-    let parentElemId = e.target.parentElement.id;
+  const addOrDecreaseQty = (e) => {
+    const parentElemId = e.target.parentElement.id;
 
-    ingredients.forEach((item) => {
-      if (parentElemId === item.blockId) {
-        dispatch({
-          type: addMoleculesType.ADD_DECREASE_QTY,
-          id: parentElemId,
-          qty: checkAddDecreaseBtn(e, item.qty)
-        });
-      }
-    });
+    setParentElementId(e.target.parentElement.id);
+
+    addDecreaseQty(e, parentElemId, dispatch, ingredients);
   };
 
-  const checkAddDecreaseBtn = (e, item) => {
-    if(e.target.id === "add"){
-      return item + 1
+  useEffect(() => {
+    if (ingredients.some((el) => el.qty === 0)) {
+      removeSelectedMolecule(parentElementId, dispatch, ingredients);
     }
-    if(e.target.id === "decrease"){
-      return item - 1
-    }
-  }
+  }, [dispatch, ingredients, parentElementId]);
 
   const addIngredients = (e) => {
     let parentElemId = e.target.parentElement.id;
+    let selectedMoleculesId = ingredients.map((mol) => mol.blockId);
 
-    molecules.forEach((item) => {
-      if (parentElemId === item.dataMolecules._id) {
-        dispatch({
-          type: addMoleculesType.ADD_INGREDIENTS,
-          payload: {
-            title: item.dataMolecules.title,
-            qty: item.dataMolecules.qty,
-            discount_price: item.dataMolecules.discount_price,
-            blockId: item.dataMolecules._id,
-          },
-        });
-      }
+    if (
+      ingredients.length === 0 ||
+      !selectedMoleculesId.includes(parentElemId)
+    ) {
+      molecules.forEach((item) => {
+        if (parentElemId === item.dataMolecules._id) {
+          dispatch({
+            type: addMoleculesType.ADD_INGREDIENTS,
+            payload: {
+              title: item.dataMolecules.title,
+              qty: 1,
+              discount_price: item.dataMolecules.discount_price,
+              blockId: item.dataMolecules._id,
+            },
+          });
+          dispatch({
+            type: fetchMoleculesType.SELECTED_MOLECULE,
+            id: parentElemId,
+            added: true,
+          });
+          dispatch({
+            type: addMoleculesType.ADD_PRICE,
+            price: {
+              price: item.dataMolecules.discount_price,
+              moleculeId: item.dataMolecules._id,
+            },
+          });
+        }
+      });
+    }
+    if (selectedMoleculesId.includes(parentElemId)) {
+      dispatch({
+        type: addMoleculesType.REMOVE_SELECTED_MOLECULE,
+        payload: ingredients.filter((el) => el.blockId !== parentElemId),
+      });
+      dispatch({
+        type: fetchMoleculesType.SELECTED_MOLECULE,
+        id: parentElemId,
+        added: false,
+      });
+    }
+  };
+
+  const checkOrderUniqueSalad = () => {
+    ingredients.forEach(({ qty, blockId }) => {
+      molecules.forEach(({ dataMolecules }) => {
+        if (dataMolecules.qty !== qty && blockId === dataMolecules._id) {
+          dispatch({ type: addMoleculesType.SAVED_SALAD, saved: true });
+        } else {
+          dispatch({ type: addMoleculesType.SAVED_SALAD, saved: false });
+        }
+      });
     });
   };
-
-  const removeMolecule = () => {
-    console.log("abab");
-  };
-
+console.log(moleculesPrice)
   return (
     <div className="molecules">
       <BackWelcomePage />
       <CreateUniqueSalad
-        price={`${price} $`}
+        price={` $`}
         btnLabel={saved ? "Добавлено" : "Сохранить"}
-        clickSave={() => console.log("ababa")}
+        clickSave={checkOrderUniqueSalad}
       >
         {ingredients.length === 0 ? (
-          <div>Вы пока не создали салат</div>
+          <h5>Вы пока не создали салат</h5>
         ) : (
           ingredients.map((el) => (
             <div key={el.blockId} className="salad-ingrediends">
-              <span className="salad-ingredient_title" onClick={removeMolecule}>
-                {el.title}
-              </span>
+              <span className="salad-ingredient_title">{el.title}</span>
               <div className="unique-salad_qty" id={el.blockId}>
                 Количество:{" "}
-                <div className="decrease-add-qty" id="decrease" onClick={addDecreaseQty}>
+                <div
+                  className="decrease-add-qty"
+                  id="decrease"
+                  onClick={addOrDecreaseQty}
+                >
                   -
                 </div>{" "}
                 <span className="salad-qty_number">{el.qty}</span>
-                <div className="decrease-add-qty" id="add" onClick={addDecreaseQty}>
+                <div
+                  className="decrease-add-qty"
+                  id="add"
+                  onClick={addOrDecreaseQty}
+                >
                   +
                 </div>
+                <img
+                  src={removeMoleculeIcon}
+                  alt="remove icon"
+                  className="remove-icon"
+                  onClick={(e) =>
+                    removeSelectedMolecule(
+                      e.target.parentElement.id,
+                      dispatch,
+                      ingredients
+                    )
+                  }
+                />
+                {saved && <p>"Количество больше чем на складе"</p>}
               </div>
             </div>
           ))
@@ -102,6 +154,7 @@ const CreateSalad = () => {
 
         {error && <Error />}
       </CreateUniqueSalad>
+
       {molecules.map(({ dataMolecules, isAdded }) => {
         return (
           <MoleculesCard

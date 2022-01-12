@@ -10,10 +10,12 @@ export const MoleculesCard = ({
   btn_label,
   blockId,
 }) => {
+
+
   return (
     <div className="salad-card" id={blockId}>
       <h3 className="salad-card_title">{title} </h3>
-      <MoleculesIcon moleculeName={title}/>
+      <MoleculesIcon moleculeName={title} />
       <span className="salad-card_price">
         <p>Цена: {price} $</p>
         <p>Цена по Скидке: {discount_price} $</p>
