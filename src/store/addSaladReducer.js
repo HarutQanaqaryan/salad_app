@@ -5,17 +5,15 @@ export const addSaladType = {
   REMOVE_SALAD: "REMOVE_SALAD",
 };
 const initialState = {
-  addedSalads: JSON.parse(localStorage.getItem(ADDED_SALAD_STORAGE)) || []
+  addedSalads: JSON.parse(localStorage.getItem(ADDED_SALAD_STORAGE)) || [],
 };
 
 export const addSaladReducer = (state = initialState, action) => {
   switch (action.type) {
     case addSaladType.ADD_SALAD:
-      return {
-        addedSalads: [...state.addedSalads, action.payload],
-      };
+      return { ...state, addedSalads: [...state.addedSalads, action.payload] };
     case addSaladType.REMOVE_SALAD:
-      return { addedSalads: action.payload};
+      return { ...state, addedSalads: action.payload };
     default:
       return state;
   }

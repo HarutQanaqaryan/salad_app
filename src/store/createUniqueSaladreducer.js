@@ -5,8 +5,9 @@ export const addMoleculesType = {
   SAVED_SALAD: "SAVED_SALAD",
   REMOVE_SELECTED_MOLECULE: "REMOVE_SELECTED_MOLECULE",
   UPDATE_INGREDIENTS_PRICE: "UPDATE_INGREDIENTS_PRICE",
+  VALID_QTY: "VALID_QTY"
 };
-const initialState = {
+export const initialState = {
   ingredients: [],
   moleculesPrice: 0,
   saved: false,
@@ -20,13 +21,13 @@ export const createUniqueSaladReducer = (state = initialState, action) => {
         ingredients: [...state.ingredients, action.payload],
       };
     case addMoleculesType.ADD_PRICE:
-      return { moleculesPrice: action.price };
+      return { ...state, moleculesPrice: action.price };
     case addMoleculesType.ADD_DECREASE_QTY:
       return {
         ...state,
         ingredients: state.ingredients.map((molecule) =>
           molecule.blockId === action.id
-            ? { ...molecule, qty: action.qty, price: action.qty }
+            ? { ...molecule, qty: action.qty }
             : molecule
         ),
       };
@@ -39,10 +40,19 @@ export const createUniqueSaladReducer = (state = initialState, action) => {
             : price
         ),
       };
+    case addMoleculesType.VALID_QTY:
+      return {
+        ...state,
+        ingredients: state.ingredients.map((ingredient) =>
+          ingredient.blockId === action.id
+            ? { ...ingredient, isValidQty: action.qty }
+            : ingredient
+        ),
+      };
     case addMoleculesType.REMOVE_SELECTED_MOLECULE:
-      return { ingredients: action.payload };
+      return { ...state, ingredients: action.payload };
     case addMoleculesType.SAVED_SALAD:
-      return { saved: action.saved };
+      return { ...state, saved: action.saved };
     default:
       return state;
   }

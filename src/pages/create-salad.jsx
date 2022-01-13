@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import BackWelcomePage from "../components/back-to-welcome-page";
 import { MoleculesCard } from "../components/molecules-card";
@@ -17,16 +17,16 @@ import {
 import { removeSelectedMolecule } from "../helpers/removeSelectMolecule";
 import { addDecreaseQty, updatePrice } from "../helpers/addDecreaseQty";
 import { sumPrices } from "../helpers/sumPrices";
+import { checkQtyIngredients } from "../helpers/checkOrder";
 
 const CreateSalad = () => {
   const { molecules, loading, error } = useSelector((state) => state.molecules);
-  const {
-    ingredients = [],
-    moleculesPrice,
-    saved,
-  } = useSelector((state) => state.createUniqueSalad);
+  const { ingredients, moleculesPrice, saved } = useSelector(
+    (state) => state.createUniqueSalad
+  );
   const dispatch = useDispatch();
   const [parentElementId, setParentElementId] = useState();
+  const ingredientsRef = useRef()
 
   useEffect(() => {
     !localStorage.getItem(INGREDIENTS_STORAGE) && dispatch(fetchMolecules());
@@ -35,6 +35,14 @@ const CreateSalad = () => {
   // useEffect(() => {
   //   localStorage.setItem(INGREDIENTS_STORAGE, JSON.stringify(molecules));
   // }, [molecules]);
+
+  useEffect(() => {
+    dispatch({
+      type: addMoleculesType.ADD_PRICE,
+      price: sumPrices(ingredients),
+    });
+    ingredientsRef.current = ingredients
+  }, [dispatch, ingredients]);
 
   const addOrDecreaseQty = (e) => {
     const parentElemId = e.target.parentElement.id;
@@ -46,7 +54,6 @@ const CreateSalad = () => {
     addDecreaseQty(e, parentElemId, dispatch, ingredients);
   };
 
-  console.log(ingredients.map((el) => el.discount_price).reduce((acc, el) => acc + el, 0))
   useEffect(() => {
     if (ingredients.some((el) => el.qty === 0)) {
       removeSelectedMolecule(parentElementId, dispatch, ingredients);
@@ -57,10 +64,7 @@ const CreateSalad = () => {
     let parentElemId = e.target.parentElement.id;
     let selectedMoleculesId = ingredients.map((mol) => mol.blockId);
 
-    if (
-      ingredients.length === 0 ||
-      !selectedMoleculesId.includes(parentElemId)
-    ) {
+    if (!selectedMoleculesId.includes(parentElemId)) {
       molecules.forEach((item) => {
         if (parentElemId === item.dataMolecules._id) {
           dispatch({
@@ -70,6 +74,7 @@ const CreateSalad = () => {
               qty: 1,
               discount_price: item.dataMolecules.discount_price,
               blockId: item.dataMolecules._id,
+              isValidQty: false,
             },
           });
           dispatch({
@@ -92,20 +97,44 @@ const CreateSalad = () => {
       });
     }
   };
-
-  console.log(ingredients);
-
-  const checkOrderUniqueSalad = () => {
-    ingredients.forEach(({ qty, blockId }) => {
-      molecules.forEach(({ dataMolecules }) => {
-        if (dataMolecules.qty !== qty && blockId === dataMolecules._id) {
-          dispatch({ type: addMoleculesType.SAVED_SALAD, saved: true });
-        } else {
-          dispatch({ type: addMoleculesType.SAVED_SALAD, saved: false });
-        }
-      });
-    });
+  const checkQtyIngredients = () => {
+    if (
+      ingredients.length !== 0 &&
+      ingredients.every((el) => el.isValidQty === false)
+    ) {
+      dispatch({ type: addMoleculesType.SAVED_SALAD, saved: true });
+    } else {
+      dispatch({ type: addMoleculesType.SAVED_SALAD, saved: false });
+    }
   };
+
+  useEffect(() => {
+      ingredients.forEach((item) => {
+        molecules.forEach(({ dataMolecules }) => {
+          if (
+            item.qty > dataMolecules.qty &&
+            item.blockId === dataMolecules._id
+          ) {
+            dispatch({
+              type: addMoleculesType.VALID_QTY,
+              id: dataMolecules._id,
+              qty: true,
+            });
+          }
+          if (
+            item.qty <= dataMolecules.qty &&
+            item.blockId === dataMolecules._id
+          ) {
+            dispatch({
+              type: addMoleculesType.VALID_QTY,
+              id: dataMolecules._id,
+              qty: false,
+            });
+          }
+        });
+      });
+      
+  }, [dispatch, JSON.stringify(ingredients), molecules]);
 
   return (
     <div className="molecules">
@@ -113,44 +142,50 @@ const CreateSalad = () => {
       <CreateUniqueSalad
         price={`${moleculesPrice} $`}
         btnLabel={saved ? "Добавлено" : "Сохранить"}
-        clickSave={checkOrderUniqueSalad}
+        clickSave={checkQtyIngredients}
       >
         {ingredients.length === 0 ? (
           <h5>Вы пока не создали салат</h5>
         ) : (
           ingredients.map((el) => (
             <div key={el.blockId} className="salad-ingrediends">
-              <span className="salad-ingredient_title">{el.title}</span>
-              <div className="unique-salad_qty" id={el.blockId}>
-                Количество:{" "}
-                <div
-                  className="decrease-add-qty"
-                  id="decrease"
-                  onClick={addOrDecreaseQty}
-                >
-                  -
-                </div>{" "}
-                <span className="salad-qty_number">{el.qty}</span>
-                <div
-                  className="decrease-add-qty"
-                  id="add"
-                  onClick={addOrDecreaseQty}
-                >
-                  +
+              <div id={el.blockId}>
+                <span className="salad-ingredient_title">{el.title}</span>
+                <div className="unique-salad_qty" id={el.blockId}>
+                  Количество:{" "}
+                  <div
+                    className="decrease-add-qty"
+                    id="decrease"
+                    onClick={addOrDecreaseQty}
+                  >
+                    -
+                  </div>{" "}
+                  <span className="salad-qty_number">{el.qty}</span>
+                  <div
+                    className="decrease-add-qty"
+                    id="add"
+                    onClick={addOrDecreaseQty}
+                  >
+                    +
+                  </div>
+                  <img
+                    src={removeMoleculeIcon}
+                    alt="remove icon"
+                    className="remove-icon"
+                    onClick={(e) =>
+                      removeSelectedMolecule(
+                        e.target.parentElement.id,
+                        dispatch,
+                        ingredients
+                      )
+                    }
+                  />
                 </div>
-                <img
-                  src={removeMoleculeIcon}
-                  alt="remove icon"
-                  className="remove-icon"
-                  onClick={(e) =>
-                    removeSelectedMolecule(
-                      e.target.parentElement.id,
-                      dispatch,
-                      ingredients
-                    )
-                  }
-                />
-                {saved && <p>"Количество больше чем на складе"</p>}
+                {el.isValidQty && (
+                  <h6 className="salad-qty-validation-hint">
+                    Количество больше чем на складе
+                  </h6>
+                )}
               </div>
             </div>
           ))
