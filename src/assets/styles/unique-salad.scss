@@ -1,6 +1,6 @@
 @import "./variables.scss";
 
-.unique-salad {
+.unique-salad, .unique-salad-card {
   width: 300px;
   min-height: 400px;
   margin: auto;
@@ -14,7 +14,9 @@
   align-items: center;
   background-color: white;
 }
-
+.unique-salad-card {
+  margin: 20px;
+}
 .salad-ingrediends {
   margin: 20px;
   border-bottom: 1px solid rgba(0, 200, 250, 0.6);
@@ -43,9 +45,26 @@
   align-items: center;
   justify-content:space-around;
   width: 200px;
-  margin: 20px;
+  margin: 15px;
 }
-
+.unique-salad_ingredients{
+  display: flex;
+  justify-content:space-between;
+  flex-direction: column;
+}
+.unique-salad_ingredient {
+  display: flex;
+  align-items: center;
+  justify-content:center;
+  flex-direction: column;
+  width: 200px;
+  margin: 10px;
+  box-shadow: $navbar-btn;
+  padding: 5px;
+}
+.unique-salad_qty_basket {
+  padding: 5px;
+}
 .unique-salad_btn {
   padding: 10px;
   border: 1px solid rgba(0, 200, 250, 0.6);
@@ -92,4 +111,18 @@
 .salad-qty-validation-hint {
   color: red;
   margin: 0;
+}
+
+.unique-salad_name {
+  width: 230px;
+  height: 30px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(0, 200, 250, 0.6);
+  border-radius: 4px;
+}
+
+.unique-salad_name:focus {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  outline: none;
 }

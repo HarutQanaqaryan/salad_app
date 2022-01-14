@@ -1,4 +1,4 @@
-import { fetchMoleculesType, INGREDIENTS_STORAGE } from "../moleculesReducer";
+import { fetchMoleculesType, MOLECULES_STORAGE } from "../moleculesReducer";
 
 export const fetchMolecules = () => {
   return async (dispatch) => {
@@ -10,16 +10,16 @@ export const fetchMolecules = () => {
           type: fetchMoleculesType.FETCH_MOLECULES_SUCCES,
           payload: data.result.map((dataMolecules) => {
             return { dataMolecules, isAdded: false };
-          })
+          }),
         });
-        // localStorage.setItem(
-        //   INGREDIENTS_STORAGE,
-        //   JSON.stringify(
-        //     data.result.map((dataMolecules) => {
-        //       return { dataMolecules, isAdded: false };
-        //     })
-        //   )
-        // );
+        localStorage.setItem(
+          MOLECULES_STORAGE,
+          JSON.stringify(
+            data.result.map((dataMolecules) => {
+              return { dataMolecules, isAdded: false };
+            })
+          )
+        );
       })
       .catch((e) => {
         dispatch({

@@ -1,14 +1,15 @@
-export const INGREDIENTS_STORAGE = "INGREDIENTS_STORAGE";
+export const MOLECULES_STORAGE = "MOLECULES_STORAGE";
 
 export const fetchMoleculesType = {
   FETCH_MOLECULES: "FETCH_MOLECULES",
   FETCH_MOLECULES_SUCCES: "FETCH_MOLECULES_SUCCES",
   FETCH_MOLECULES_ERROR: "FETCH_MOLECULES_SUCCES",
   SELECTED_MOLECULE: "SELECTED_MOLECULE",
+  SALAD_SAVED: "SALAD_SAVED"
 };
 
 const initialState = {
-  molecules: JSON.parse(localStorage.getItem(INGREDIENTS_STORAGE)) || [],
+  molecules: JSON.parse(localStorage.getItem(MOLECULES_STORAGE)) || [],
   loading: false,
   error: false,
 };
@@ -29,7 +30,14 @@ export const moleculesReducer = (state = initialState, action) => {
             ? { ...molecule, isAdded: action.added }
             : molecule
         ),
-      }
+      };
+    case fetchMoleculesType.SALAD_SAVED:
+      return {
+        ...state,
+        molecules: state.molecules.map((molecule) => {
+          return { ...molecule, isAdded: action.isAdded };
+        }),
+      };
     default:
       return state;
   }

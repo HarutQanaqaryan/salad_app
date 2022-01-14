@@ -1,6 +1,7 @@
 import BackWelcomePage from "../components/back-to-welcome-page";
 import "../assets/styles/basket.scss";
-import { SelectedSalads } from "../components/basket-cards";
+import { SelectedSalads } from "../components/basket-salad-card";
+import { UniqueSalad } from "../components/unique-salad";
 
 const Basket = () => {
 
@@ -8,9 +9,7 @@ const Basket = () => {
     <div className="basket">
       <BackWelcomePage />
       <SelectedSalads />
-      <div className="basket-item">
-        <h3>Уникальный салаты</h3>
-      </div>
+      <UniqueSalad />
     </div>
   );
 };

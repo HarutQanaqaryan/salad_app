@@ -1,47 +1,57 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import BackWelcomePage from "../components/back-to-welcome-page";
 import { MoleculesCard } from "../components/molecules-card";
 import { fetchMolecules } from "../store/action-creators/fetch-molecules";
 import { CreateUniqueSalad } from "../components/create-unique-salad";
-import { addMoleculesType } from "../store/createUniqueSaladreducer";
-import "../assets/styles/create-salad.scss";
-import "../assets/styles/unique-salad.scss";
+import {
+  addMoleculesType,
+  INGREDIENTS_STORAGE,
+} from "../store/createUniqueSaladReducer";
 import { Loading } from "../components/loading";
 import { Error } from "../components/error";
 import removeMoleculeIcon from "../assets/remove.svg";
 import {
   fetchMoleculesType,
-  INGREDIENTS_STORAGE,
+  MOLECULES_STORAGE,
 } from "../store/moleculesReducer";
 import { removeSelectedMolecule } from "../helpers/removeSelectMolecule";
 import { addDecreaseQty, updatePrice } from "../helpers/addDecreaseQty";
 import { sumPrices } from "../helpers/sumPrices";
-import { checkQtyIngredients } from "../helpers/checkOrder";
+import {
+  ADDED_UNIQUE_SALAD_STORAGE,
+  addUniqueSaladType,
+} from "../store/addUniqueSalad";
+import "../assets/styles/create-salad.scss";
+import "../assets/styles/unique-salad.scss";
 
 const CreateSalad = () => {
   const { molecules, loading, error } = useSelector((state) => state.molecules);
-  const { ingredients, moleculesPrice, saved } = useSelector(
+  const { ingredients, uniqueSaladName, moleculesPrice, saved } = useSelector(
     (state) => state.createUniqueSalad
   );
+  const { addedUniqueSalad } = useSelector((state) => state.addUniqueSalad);
   const dispatch = useDispatch();
   const [parentElementId, setParentElementId] = useState();
-  const ingredientsRef = useRef()
 
   useEffect(() => {
-    !localStorage.getItem(INGREDIENTS_STORAGE) && dispatch(fetchMolecules());
+    !localStorage.getItem(MOLECULES_STORAGE) && dispatch(fetchMolecules());
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   localStorage.setItem(INGREDIENTS_STORAGE, JSON.stringify(molecules));
-  // }, [molecules]);
+  useEffect(() => {
+    localStorage.setItem(MOLECULES_STORAGE, JSON.stringify(molecules));
+    localStorage.setItem(
+      ADDED_UNIQUE_SALAD_STORAGE,
+      JSON.stringify(addedUniqueSalad)
+    );
+    localStorage.setItem(INGREDIENTS_STORAGE, JSON.stringify(ingredients));
+  }, [molecules, ingredients, addedUniqueSalad]);
 
   useEffect(() => {
     dispatch({
       type: addMoleculesType.ADD_PRICE,
       price: sumPrices(ingredients),
     });
-    ingredientsRef.current = ingredients
   }, [dispatch, ingredients]);
 
   const addOrDecreaseQty = (e) => {
@@ -96,44 +106,88 @@ const CreateSalad = () => {
         added: false,
       });
     }
+    if (addedUniqueSalad.includes(parentElemId)) {
+      dispatch({
+        type: addUniqueSaladType.REMOVE_UNIQUE_SALAD,
+        payload: addedUniqueSalad.filter((el) => el.blockId !== parentElemId),
+      });
+    }
+    if (
+      JSON.parse(
+        localStorage.getItem(ADDED_UNIQUE_SALAD_STORAGE).includes(parentElemId)
+      )
+    ) {
+      return (
+        JSON.parse(localStorage.getItem(ADDED_UNIQUE_SALAD_STORAGE)).filter(
+          (item) => item.blockId !== parentElemId
+        ),
+        dispatch({
+          type: fetchMoleculesType.SELECTED_MOLECULE,
+          id: parentElemId,
+          added: false,
+        })
+      );
+    }
   };
+
   const checkQtyIngredients = () => {
     if (
       ingredients.length !== 0 &&
       ingredients.every((el) => el.isValidQty === false)
     ) {
       dispatch({ type: addMoleculesType.SAVED_SALAD, saved: true });
+      dispatch({
+        type: addUniqueSaladType.ADD_UNIQUE_SALAD,
+        addUniqueSalad: {
+          ingredients: ingredients.map((el) => {
+            return {
+              title: el.title,
+              qty: el.qty,
+            };
+          }),
+          saladName: uniqueSaladName,
+          price: moleculesPrice,
+          blockId: JSON.stringify(Math.random()),
+        },
+      });
+      dispatch({ type: addMoleculesType.REMOVE_INGREDIENTS });
+      dispatch({ type: fetchMoleculesType.SALAD_SAVED, isAdded: false });
     } else {
       dispatch({ type: addMoleculesType.SAVED_SALAD, saved: false });
     }
   };
 
+
+  const handleUniqueSaladName = (e) => {
+    dispatch({ type: addMoleculesType.ADD_NAME, name: e.target.value });
+  };
+  
+
   useEffect(() => {
-      ingredients.forEach((item) => {
-        molecules.forEach(({ dataMolecules }) => {
-          if (
-            item.qty > dataMolecules.qty &&
-            item.blockId === dataMolecules._id
-          ) {
-            dispatch({
-              type: addMoleculesType.VALID_QTY,
-              id: dataMolecules._id,
-              qty: true,
-            });
-          }
-          if (
-            item.qty <= dataMolecules.qty &&
-            item.blockId === dataMolecules._id
-          ) {
-            dispatch({
-              type: addMoleculesType.VALID_QTY,
-              id: dataMolecules._id,
-              qty: false,
-            });
-          }
-        });
+    ingredients.forEach((item) => {
+      molecules.forEach(({ dataMolecules }) => {
+        if (
+          item.qty > dataMolecules.qty &&
+          item.blockId === dataMolecules._id
+        ) {
+          dispatch({
+            type: addMoleculesType.VALID_QTY,
+            id: dataMolecules._id,
+            qty: true,
+          });
+        }
+        if (
+          item.qty <= dataMolecules.qty &&
+          item.blockId === dataMolecules._id
+        ) {
+          dispatch({
+            type: addMoleculesType.VALID_QTY,
+            id: dataMolecules._id,
+            qty: false,
+          });
+        }
       });
-      
+    });
   }, [dispatch, JSON.stringify(ingredients), molecules]);
 
   return (
@@ -141,8 +195,10 @@ const CreateSalad = () => {
       <BackWelcomePage />
       <CreateUniqueSalad
         price={`${moleculesPrice} $`}
-        btnLabel={saved ? "Добавлено" : "Сохранить"}
+        btnLabel={"Сохранить"}
         clickSave={checkQtyIngredients}
+        value={uniqueSaladName}
+        onChange={handleUniqueSaladName}
       >
         {ingredients.length === 0 ? (
           <h5>Вы пока не создали салат</h5>

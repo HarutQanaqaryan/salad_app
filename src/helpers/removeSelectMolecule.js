@@ -1,4 +1,4 @@
-import { addMoleculesType } from "../store/createUniqueSaladreducer";
+import { addMoleculesType } from "../store/createUniqueSaladReducer";
 import { fetchMoleculesType } from "../store/moleculesReducer";
 
 export const removeSelectedMolecule = (

@@ -4,7 +4,7 @@ const WelcomePage = () => {
   return (
     <div className="welcome-page">
         <h1 className="welcome-page-greetings">
-          Салат с Молейкулами, мой любопытный друг !
+          Здравствуй, мой любопытный друг !
         </h1>
       <h3 className="welcome-page-description">
         Собери свой уникальный салат с молекулами или выбери одно из готовых

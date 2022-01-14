@@ -1,3 +1,5 @@
+export const INGREDIENTS_STORAGE = "INGREDIENTS_STORAGE";
+
 export const addMoleculesType = {
   ADD_INGREDIENTS: "ADD_INGREDIENTS",
   ADD_PRICE: "ADD_PRICE",
@@ -5,10 +7,13 @@ export const addMoleculesType = {
   SAVED_SALAD: "SAVED_SALAD",
   REMOVE_SELECTED_MOLECULE: "REMOVE_SELECTED_MOLECULE",
   UPDATE_INGREDIENTS_PRICE: "UPDATE_INGREDIENTS_PRICE",
-  VALID_QTY: "VALID_QTY"
+  VALID_QTY: "VALID_QTY",
+  ADD_NAME: "ADD_NAME",
+  REMOVE_INGREDIENTS: "REMOVE_INGREDIENTS"
 };
 export const initialState = {
-  ingredients: [],
+  uniqueSaladName: "",
+  ingredients: JSON.parse(localStorage.getItem(INGREDIENTS_STORAGE)) || [],
   moleculesPrice: 0,
   saved: false,
 };
@@ -20,6 +25,10 @@ export const createUniqueSaladReducer = (state = initialState, action) => {
         ...state,
         ingredients: [...state.ingredients, action.payload],
       };
+      case addMoleculesType.REMOVE_INGREDIENTS:
+        return {
+          ...state, ingredients: []
+        }
     case addMoleculesType.ADD_PRICE:
       return { ...state, moleculesPrice: action.price };
     case addMoleculesType.ADD_DECREASE_QTY:
@@ -49,6 +58,8 @@ export const createUniqueSaladReducer = (state = initialState, action) => {
             : ingredient
         ),
       };
+    case addMoleculesType.ADD_NAME:
+      return { ...state, uniqueSaladName: action.name };
     case addMoleculesType.REMOVE_SELECTED_MOLECULE:
       return { ...state, ingredients: action.payload };
     case addMoleculesType.SAVED_SALAD:

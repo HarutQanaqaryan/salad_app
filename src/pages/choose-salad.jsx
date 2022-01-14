@@ -20,6 +20,10 @@ const ChooseSalad = () => {
     !localStorage.getItem(DATA_SALAD_STORAGE) && dispatch(fetchSalads());
   }, [dispatch]);
 
+  useEffect(() => {
+    localStorage.setItem(DATA_SALAD_STORAGE, JSON.stringify(salads))
+  }, [salads])
+
   const addMySalads = useCallback(
     (e) => {
       let parentElemId = e.target.parentElement.id;
