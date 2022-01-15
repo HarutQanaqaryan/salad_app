@@ -1,8 +1,8 @@
 import { combineReducers } from "redux";
 import { addSaladReducer } from "../addSaladReducer";
 import { addUniqueSaladReducer } from "../addUniqueSalad";
-import { createUniqueSaladReducer } from "../createUniqueSaladReducer";
-import { moleculesReducer } from "../moleculesReducer";
+import { createUniqueSaladReducer } from "../createUniqueSaladreducer";
+import { moleculesReducer } from "../moleculesreducer";
 import { saladsReducer } from "../saladReducer";
 
 

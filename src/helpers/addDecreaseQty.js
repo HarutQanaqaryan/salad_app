@@ -1,4 +1,4 @@
-import { addMoleculesType } from "../store/createUniqueSaladReducer";
+import { addMoleculesType } from "../store/createUniqueSaladreducer";
 
 const checkAddDecreaseBtn = (e, item) => {
   if (e.target.id === "add") {

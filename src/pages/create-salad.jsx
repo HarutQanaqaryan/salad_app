@@ -7,14 +7,14 @@ import { CreateUniqueSalad } from "../components/create-unique-salad";
 import {
   addMoleculesType,
   INGREDIENTS_STORAGE,
-} from "../store/createUniqueSaladReducer";
+} from "../store/createUniqueSaladreducer";
 import { Loading } from "../components/loading";
 import { Error } from "../components/error";
 import removeMoleculeIcon from "../assets/remove.svg";
 import {
   fetchMoleculesType,
   MOLECULES_STORAGE,
-} from "../store/moleculesReducer";
+} from "../store/moleculesreducer";
 import { removeSelectedMolecule } from "../helpers/removeSelectMolecule";
 import { addDecreaseQty, updatePrice } from "../helpers/addDecreaseQty";
 import { sumPrices } from "../helpers/sumPrices";
