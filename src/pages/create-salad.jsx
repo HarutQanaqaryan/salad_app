@@ -27,7 +27,7 @@ import "../assets/styles/unique-salad.scss";
 
 const CreateSalad = () => {
   const { molecules, loading, error } = useSelector((state) => state.molecules);
-  const { ingredients, uniqueSaladName, moleculesPrice, saved } = useSelector(
+  const { ingredients, uniqueSaladName, moleculesPrice } = useSelector(
     (state) => state.createUniqueSalad
   );
   const { addedUniqueSalad } = useSelector((state) => state.addUniqueSalad);
