@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import BackWelcomePage from "../components/back-to-welcome-page";
@@ -10,19 +10,22 @@ import { Loading } from "../components/loading";
 import { Error } from "../components/error";
 import "../assets/styles/choose-salad.scss";
 
-
 const ChooseSalad = () => {
   const { salads, loading, error } = useSelector((state) => state.salads);
   const { addedSalads } = useSelector((state) => state.mySalads);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    !localStorage.getItem(DATA_SALAD_STORAGE) && dispatch(fetchSalads());
+    localStorage.getItem(DATA_SALAD_STORAGE) || dispatch(fetchSalads());
   }, [dispatch]);
 
+  const setItemLocalStorage = useCallback(() => {
+    localStorage.setItem(DATA_SALAD_STORAGE, JSON.stringify(salads));
+  }, [salads]);
+
   useEffect(() => {
-    localStorage.setItem(DATA_SALAD_STORAGE, JSON.stringify(salads))
-  }, [salads])
+    setItemLocalStorage();
+  }, [setItemLocalStorage]);
 
   const addMySalads = useCallback(
     (e) => {

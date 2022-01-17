@@ -1,9 +1,10 @@
+import { GET_MOLECULES } from "../../API";
 import { fetchMoleculesType, MOLECULES_STORAGE } from "../moleculesreducer";
 
 export const fetchMolecules = () => {
   return async (dispatch) => {
     dispatch({ type: fetchMoleculesType.FETCH_MOLECULES });
-    fetch("http://test-job.webatom.ru/molecules")
+    fetch(GET_MOLECULES)
       .then((res) => res.json())
       .then((data) => {
         dispatch({

@@ -1,9 +1,10 @@
+import { GET_SALADS } from "../../API";
 import { DATA_SALAD_STORAGE, fetchSaladsType } from "../saladReducer";
 
 export const fetchSalads = () => {
   return async (dispatch) => {
     dispatch({ type: fetchSaladsType.FETCH_SALADS });
-    fetch("http://test-job.webatom.ru/salads")
+    fetch(GET_SALADS)
       .then((res) => res.json())
       .then((data) => {
         dispatch({

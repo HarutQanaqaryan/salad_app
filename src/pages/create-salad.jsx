@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import BackWelcomePage from "../components/back-to-welcome-page";
 import { MoleculesCard } from "../components/molecules-card";
@@ -35,17 +35,21 @@ const CreateSalad = () => {
   const [parentElementId, setParentElementId] = useState();
 
   useEffect(() => {
-    !localStorage.getItem(MOLECULES_STORAGE) && dispatch(fetchMolecules());
+    localStorage.getItem(MOLECULES_STORAGE) || dispatch(fetchMolecules());
   }, [dispatch]);
 
-  useEffect(() => {
+  const setMoleculesLocalStorage = useCallback(() => {
     localStorage.setItem(MOLECULES_STORAGE, JSON.stringify(molecules));
+  }, [molecules]);
+
+  useEffect(() => {
+    setMoleculesLocalStorage();
     localStorage.setItem(
       ADDED_UNIQUE_SALAD_STORAGE,
       JSON.stringify(addedUniqueSalad)
     );
     localStorage.setItem(INGREDIENTS_STORAGE, JSON.stringify(ingredients));
-  }, [molecules, ingredients, addedUniqueSalad]);
+  }, [setMoleculesLocalStorage, ingredients, addedUniqueSalad]);
 
   useEffect(() => {
     dispatch({
@@ -157,11 +161,9 @@ const CreateSalad = () => {
     }
   };
 
-
   const handleUniqueSaladName = (e) => {
     dispatch({ type: addMoleculesType.ADD_NAME, name: e.target.value });
   };
-  
 
   useEffect(() => {
     ingredients.forEach((item) => {
