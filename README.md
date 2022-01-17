@@ -11,7 +11,7 @@
 
 
 
-###### PS: installation and launch instructions=>
+##### PS: installation and launch instruction =>
 ###### 1. git clone https://github.com/HarutQanaqaryan/salad_app.git
 ###### 2. remove package-lock.json file
 ###### 3. npm install
